@@ -35,7 +35,6 @@ function SearchInput(props, ref) {
      * @param {Event} evt
      */
     function onChangeHandler(evt) {
-        console.log('change')
         setInputText(inputRef.current.value)
     }
 
@@ -57,7 +56,6 @@ function SearchInput(props, ref) {
                 if (val === '') {
                     onClear()
                 }
-                onChange(val)
         }
     }
 
