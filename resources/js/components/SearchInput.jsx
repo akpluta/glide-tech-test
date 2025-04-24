@@ -2,16 +2,17 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from "react"
 
 /**
  * @param {{
+ *      inputRef: reference,
  *      placeholder: string,
  *      disabled: boolean,
- *      inputRef: reference,
- *      onChange: (text: string) => any|null,
- *      onSearch: (text: string) => any|null,
- *      onClear: () => any|null,
+ *      className: null|string,
+ *      onChange: null|function(text: string): any,
+ *      onReset: null|function(): any,
+ *      onSubmit: null|function(text: string): any,
  *  }} props
  * @param {*} ref
+ *
  * @returns {JSX.Element}
- * @constructor
  */
 function SearchInput(props, ref) {
     const [inputText, setInputText] = useState('')
@@ -21,13 +22,13 @@ function SearchInput(props, ref) {
     const {
         placeholder= 'Enter one or more MAC addresses',
         disabled,
+        className= '',
         onChange = noop,
-        onClear = noop,
-        onSearch = noop,
+        onReset = noop,
+        onSubmit = noop,
     } = props
 
     useImperativeHandle(ref, () => ({
-        getSearchText: () => inputText,
         clear: () => inputRef.current.value = '',
     }));
 
@@ -36,6 +37,7 @@ function SearchInput(props, ref) {
      */
     function onChangeHandler(evt) {
         setInputText(inputRef.current.value)
+        onChange(inputRef.current.value)
     }
 
     /**
@@ -44,17 +46,18 @@ function SearchInput(props, ref) {
     function onKeyDownHandler(evt) {
         switch (evt.key) {
             case 'Enter':
-                onSearch(inputText)
+                onSubmit(inputText)
                 break;
+
             case 'Escape':
                 setInputText(inputRef.current.value = '')
-                onClear()
+                onReset()
                 break;
 
             default:
                 const val = evt.currentTarget.value
                 if (val === '') {
-                    onClear()
+                    onReset()
                 }
         }
     }
@@ -67,13 +70,9 @@ function SearchInput(props, ref) {
             disabled={disabled}
             onKeyUp={onKeyDownHandler}
             onChange={onChangeHandler}
-            className="
-                    flex-grow-1 bg-white appearance-none border border-gray-300
-                    rounded mr-2 py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline
-                    disabled:text-gray-300 placeholder:italic"
+            className={className}
         />
     )
 }
 
-const SearchInputWithRef = forwardRef(SearchInput)
-export default SearchInputWithRef
+export default forwardRef(SearchInput)
